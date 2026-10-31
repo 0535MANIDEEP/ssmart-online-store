@@ -1,1 +1,29 @@
-﻿
+﻿name: Build & Push Backend
+
+on:
+  push:
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend.yml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ "{{" }} github.actor ${{ "}}" }}
+          password: ${{ "{{" }} secrets.GITHUB_TOKEN ${{ "}}" }}
+
+      - name: Build Docker image
+        run: |
+          docker build -t ghcr.io/0535MANIDEEP/ssmart-backend:latest backend
+
+      - name: Push Docker image
+        run: |
+          docker push ghcr.io/0535MANIDEEP/ssmart-backend:latest

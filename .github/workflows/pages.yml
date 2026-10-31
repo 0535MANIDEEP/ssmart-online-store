@@ -1,1 +1,35 @@
-﻿
+﻿name: Deploy Front‑end to GitHub Pages
+
+on:
+  push:
+    paths:
+      - "frontend/**"
+      - ".github/workflows/pages.yml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      REACT_APP_BACKEND_URL: ${{ "{{" }} secrets.BACKEND_URL ${{ "}}" }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build React app
+        working-directory: frontend
+        run: npm run build
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ "{{" }} secrets.GITHUB_TOKEN ${{ "}}" }}
+          publish_dir: frontend/build
